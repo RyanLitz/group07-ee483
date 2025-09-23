@@ -15,11 +15,11 @@ class Driver():#CHANGE CLASSNAME to the name of your class
         cmd_to_publish = WheelsCmdStamped()
         cmd_to_publish.header.stamp = rospy.Time.now()
 
-        cmd_to_publish.vel_right = 0.2
-        cmd_to_publish.vel_left = -0.2
+        cmd_to_publish.vel_right = 0.3
+        cmd_to_publish.vel_left = -0.3
         self.pub.publish(cmd_to_publish)
 
-        time.sleep(1.15)
+        rospy.sleep(0.58)
 
         cmd_to_publish.vel_right = 0
         cmd_to_publish.vel_left = 0
@@ -29,14 +29,22 @@ class Driver():#CHANGE CLASSNAME to the name of your class
         cmd_to_publish = WheelsCmdStamped()
         cmd_to_publish.header.stamp = rospy.Time.now()
 
-        cmd_to_publish.vel_right = 0.5
-        cmd_to_publish.vel_left = 0.5
+        cmd_to_publish.vel_right = 0
+        cmd_to_publish.vel_left = 0
 
+        for i in range (5):
+            x = 0.1
+            cmd_to_publish.vel_right += x
+            cmd_to_publish.vel_left += x
+            rospy.sleep(0.1)
+        cmd_to_publish.vel_left = 0.5
+        cmd_to_publish.vel_right = 0.5
         self.pub.publish(cmd_to_publish)
         
         #print("Driving the MM " + self.veh_name + " around the block") # Just for testin
         
-        time.sleep(3.5)
+        #time.sleep(3.5)
+        rospy.sleep(3.8)
         cmd_to_publish.vel_right = 0
         cmd_to_publish.vel_left = 0
 
@@ -47,15 +55,15 @@ class Driver():#CHANGE CLASSNAME to the name of your class
         cmd_to_publish = WheelsCmdStamped()
         cmd_to_publish.header.stamp = rospy.Time.now()
 
-        time.sleep(1)
+        rospy.sleep(2)
 
         for i in range(4):
             self.pub.publish(cmd_to_publish)
-            time.sleep(0.5)
             drive.moveForward()
             self.pub.publish(cmd_to_publish)
-            time.sleep(0.5)
+            rospy.sleep(5)
             drive.turn90()
+            rospy.sleep(5)
             self.pub.publish(cmd_to_publish)
         
         self.pub.publish(cmd_to_publish)
@@ -70,8 +78,9 @@ if __name__ == "__main__": ## The main function which will be called when your p
         drive = Driver() # Create obj of the Driver class
         rospy.sleep(3) # Delay to wait enough time for the code to run
         # Keep the line above - you might be able to reduce the delay a bit,
-        while not rospy.is_shutdown(): # Run ros forever - you can change
-            # this as well instead of running forever
-            drive.square() # calling your node function
+        # while not rospy.is_shutdown(): # Run ros forever - you can change
+        #     # this as well instead of running forever
+        #     drive.square() # calling your node function
+        drive.square()
     except rospy.ROSInterruptException:
         pass
