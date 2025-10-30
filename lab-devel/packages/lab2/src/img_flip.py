@@ -8,6 +8,7 @@ import numpy as np
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
 
+
 class ImageFilter:
     def __init__(self):
         # Instatiate the converter class once by using a class member

@@ -10,7 +10,7 @@ project(finalproject)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   duckietown_msgs
-  gemoetry_msgs
+  geometry_msgs
   roscpp
   rospy
   std_msgs

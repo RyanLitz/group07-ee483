@@ -1,0 +1,20 @@
+<launch>
+
+
+
+<node pkg="finalproject" name="follow_mm" type="follow_mm.py" output="screen"/>
+
+ <remap from="vehicle_detection_node/image" to="camera_node/image/compressed" />
+ <remap from="vehicle_detection_node/detection" to="road_anomaly_watcher/obstacle_exists" />
+
+<include file="$(find vehicle_detection)/launch/vehicle_detection_node.launch"> 
+    <arg name="veh" value="ee483mm07"/>
+</include>
+
+
+<include file="$(find vehicle_detection)/launch/vehicle_filter_node.launch"> 
+    <arg name="veh" value="ee483mm07"/>
+</include>
+
+</launch>
+
