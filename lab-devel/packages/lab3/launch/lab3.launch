@@ -34,7 +34,7 @@
         <!-- Lane Following stack -->
         <arg name="lane_following" value="true"/>
 		<!-- The duckiebot lane detector. Initially as true (Active). If you want to use your lane detector, change the value to "false" and start your node in the next group in line 52-->
-        <arg name="/lane_following/line_detection" value="true"/>
+        <arg name="/lane_following/line_detection" value="false"/>
         
 		<arg name="line_detector_param_file_name" value="default" />
         <arg name="/lane_following/ground_projection" value="true"/>
@@ -49,7 +49,7 @@
 
     <group ns="$(env VEHICLE_NAME)">
         <!-- UNCOMMENT The line below to start  your lane detection node instead of duckiebots. Update the parameters as needed and make sure to change the /lane_following/line_detection value to false in line 37-->
-		<!-- <node pkg = "lab3" type = "line_detection.py" name = "line_detection" output = "screen"/> -->
+		<node pkg = "lab3" type = "line_detection.py" name = "line_detection" output = "screen"/>
 
 		<!-- Add your controller and odometry nodes below -->
         

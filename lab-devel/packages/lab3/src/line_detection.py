@@ -57,9 +57,9 @@ class ImageProcessor:
         #Finds all pixels within the given range. In this scenario its red
         # CHANGE TO YOUR VALUES
 
-        mask = cv2.inRange(self.hsv_image, (70,0,145),(140,120,255))
-        # mask2 = cv2.inRange(self.hsv_image, (13,0,154),(33,255,255))
-        # mask = cv2.bitwise_or(mask,mask2)
+        mask1 = cv2.inRange(self.hsv_image, (97,0,140), (180,65,255))
+        mask2 = cv2.inRange(self.hsv_image, (17,0,139), (41,255,255))
+        mask = cv2.bitwise_or(mask1,mask2)
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
         kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
         # image_erode = cv2.erode(red_part, kernel)
@@ -90,8 +90,7 @@ class ImageProcessor:
 
     def segment(self):
         #Convert image from BGR to HSV
-        # CHANGE VALUES TO YOUR VALUES
-
+        #we had the same canny values
         edges = cv2.Canny(self.cv_crop, 100, 200)
 
         #Combinining edges with mask white 
@@ -106,8 +105,8 @@ class ImageProcessor:
 
         
         #Finding Line Segments
-        # CHANGE VALUES TO YOUR VALUES
-        hough_white = cv2.HoughLinesP(edges_white, 1, np.pi / 180, 10,minLineLength=20,maxLineGap=3)
+        
+        hough_white = cv2.HoughLinesP(edges_white ,1,np.pi/180, 20, minLineLength=30, maxLineGap=5)
         
         # CHANGE VALUES IF NEEDED 
         hough_yellow = cv2.HoughLinesP(edges_yellow, 1, np.pi / 180, 0,minLineLength=20,maxLineGap=10)
