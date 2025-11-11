@@ -52,8 +52,15 @@
 		<node pkg = "lab3" type = "line_detection.py" name = "line_detection" output = "screen"/>
 
 		<!-- Add your controller and odometry nodes below -->
+        <node pkg = "lab3" type = "PID_controller.py" name = "pidcontroller" output = "screen"/>
         
 
     </group>
+
+
+    <param name="kp" type="double" value="3.0"/>
+    <param name="ki" type="double" value="0.02"/>
+    <param name="kd" type="double" value="0.18"/>
+    <param name = "velocity" type="double" value="0.0"/>
 
 </launch>

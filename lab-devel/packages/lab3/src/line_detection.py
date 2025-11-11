@@ -24,7 +24,6 @@ class ImageProcessor:
         veh_name = os.environ['VEHICLE_NAME']
         rospy.Subscriber(f"/{veh_name}/camera_node/image/compressed", CompressedImage, self.processor, queue_size=1, buff_size= 2**24)
 
-        rospy.Subscriber(f"/{veh_name}/lane_filter_node/lane_pose", LanePose, self.pidCallBack, queue_size=1)
         
         #rospy.Subscriber("image", Image, self.processor, queue_size=1, buff_size= 2**24)
         self.pub_edges = rospy.Publisher("image_edges", Image, queue_size=10)
@@ -35,7 +34,6 @@ class ImageProcessor:
         self.pub_lines = rospy.Publisher("image_lines", Image, queue_size=10)
         self.pub_segments = rospy.Publisher("line_detector_node/segment_list", SegmentList, queue_size=10)
 
-        self.pub_pid = rospy.Publisher(f"/{veh_name}/car_cmd_switch_node/cmd", Twist2DStamped, queue_size=10)
         
         #variables used in class
         self.hsv_image = None
@@ -43,10 +41,6 @@ class ImageProcessor:
         self.cv_crop = None
         self.white_mask = None
         self.yellow_mask = None
-
-        self.prevTime = None
-        self.prevError = None
-        self.cumulative_error = 0.0
 
     def processor(self, msg):
         self.cv_img = self.bridge.compressed_imgmsg_to_cv2(msg, "bgr8")
@@ -205,61 +199,6 @@ class ImageProcessor:
     def lf_switch(self,msg):
         return True,""
     
-    def pidCallBack(self, msg):
-
-        car_cmd = Twist2DStamped()
-        car_cmd.v = 0.0
-        #paremeters for equation?
-        kp = 3.0
-        ki = 0.02
-        kd = 0.18
-
-        now = rospy.Time.now()
-
-        phi = -msg.phi
-
-        if(phi >= -0.15 and phi <= 0.15):
-            phi = 0
-        
-        if(self.prevTime == None or self.prevError == None):
-            #set current time to previous time for next loop
-            self.prevTime = now
-
-            #set current error to previous error
-            self.prevError = phi
-
-            return
-
-        dt = (now - self.prevTime).to_sec()
-
-        if(dt <= 0):
-            #set current time to previous time for next loop
-            self.prevTime = now
-
-            #set current error to previous error
-            self.prevError = phi
-
-            return
-
-        #code for integration
-        self.cumulative_error += dt * phi
-
-        #code for derivative
-        deriv = (phi - self.prevError) / dt
-
-        #make control signal based on formula from handout
-        control_signal = kp*phi + ki*self.cumulative_error + kd*deriv
-
-        car_cmd.omega = control_signal
-
-        self.pub_pid.publish(car_cmd)
-
-        #set current time to previous time for next loop
-        self.prevTime = now
-
-        #set current error to previous error
-        self.prevError = phi
-        
 
 if __name__=="__main__":
     # initialize our node and create a publisher as normal
