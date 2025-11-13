@@ -11,14 +11,14 @@ from duckietown_msgs.msg import LanePose,Twist2DStamped
 class PidController:
     def __init__(self):
         veh_name = os.environ['VEHICLE_NAME']
-        rospy.Subscriber(f"/{veh_name}/lane_filter_node/lane_pose", LanePose, self.pidCallBack, queue_size=1)
+        rospy.Subscriber(f"/{veh_name}/lane_filter_node/lane_pose", LanePose, self.pidStaticandMoving, queue_size=1)
         self.pub_pid = rospy.Publisher(f"/{veh_name}/car_cmd_switch_node/cmd", Twist2DStamped, queue_size=10)
 
         self.prevTime = None
         self.prevError = None
         self.cumulative_error = 0.0
     
-    def pidCallBack(self, msg):
+    def pidStaticandMoving(self, msg):
 
         car_cmd = Twist2DStamped()
         car_cmd.v = rospy.get_param("/velocity")
@@ -32,7 +32,7 @@ class PidController:
         phi = -msg.phi
 
         phi_list = []
-
+        #moving average filter (noise reduction filter)
         if(len(phi_list) < 5):
             phi_list.append(phi)
         else:
@@ -41,8 +41,8 @@ class PidController:
             phi_list.pop(0)
 
             phi = (phi_list[0] + phi_list[1] + phi_list[2] + phi_list[3] + phi_list[4]) / 5.0
-
-        if(phi >= -0.15 and phi <= 0.15):
+        
+        if(phi >= -0.1 and phi <= 0.1):
             phi = 0
         
         if(self.prevTime == None or self.prevError == None):
