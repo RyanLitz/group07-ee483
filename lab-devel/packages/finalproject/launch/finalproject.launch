@@ -16,5 +16,7 @@
     <arg name="veh" value="ee483mm07"/>
 </include>
 
+<include file="$(find lab3)/launch/lab3.launch"/>
+
 </launch>
 

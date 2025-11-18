@@ -1,0 +1,27 @@
+#!/bin/bash
+
+HW_PACKAGE="finalproject"
+HW_LAUNCH="finalproject.launch"
+
+source /environment.sh
+
+# initialize launch file
+dt-launchfile-init
+
+# YOUR CODE BELOW THIS LINE
+# ----------------------------------------------------------------------------
+catkin build finalproject
+catkin build lab3
+source /code/catkin_ws/devel/setup.bash
+
+# NOTE: Use the variable DT_REPO_PATH to know the absolute path to your code
+# NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
+
+# launching app
+roslaunch $HW_PACKAGE $HW_LAUNCH
+
+# ----------------------------------------------------------------------------
+# YOUR CODE ABOVE THIS LINE
+
+# wait for app to end
+dt-launchfile-join
