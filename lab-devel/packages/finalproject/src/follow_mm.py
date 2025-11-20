@@ -16,12 +16,10 @@ from sensor_msgs.msg import Range
 class FollowMM:
     def __init__(self):
         self.bridge = CvBridge()
-        blobImage = Subscriber("~debug/detection_image/compressed",CompressedImage)
-        detectFlag = Subscriber("~detection", BoolStamped)
-        
 
-        ats = ApproximateTimeSynchronizer([blobImage,detectFlag], queue_size=5, slop=0.1)
-        ats.registerCallback(self.detect_MM)
+        rospy.Subscriber("~debug/detection_image/compressed",CompressedImage)
+        
+        rospy.Subscriber("/ee483mm07/vehicle_detection_node/detection", BoolStamped, self.detect_MM)
 
         rospy.Subscriber("/ee483mm07/front_center_tof_driver_node/range", Range, self.distanceBetween)
 
@@ -29,8 +27,8 @@ class FollowMM:
 
         
     #this function returns basically if the duckiebot detects another bot
-    def detect_MM(self, image_msg, detect_msg):
-        self.detected = detect_msg.data
+    def detect_MM(self, msg):
+        self.detected = msg.data
         rospy.loginfo(f"[follow_mm] detection flag: {self.detected}")
 
     def distanceBetween(self, msg):
@@ -41,9 +39,15 @@ class FollowMM:
 
             if dist <= 0.10:  
                 rospy.logwarn("[follow_mm] Too close → stopping.")
-                rospy.set_param("/velocity", 0.0)   
+                rospy.set_param("/velocity", 0.0) 
+            elif dist <= 0.2:
+                rospy.set_param("/velocity", 0.2)
+            else:
+                rospy.set_param("/velocity", 0.3)
+            
         else:
             rospy.loginfo("[follow_mm] No robot detected.")
+            rospy.set_param("/velocity", 0.3)
         
 
         

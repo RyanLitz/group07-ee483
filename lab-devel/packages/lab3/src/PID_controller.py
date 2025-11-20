@@ -17,6 +17,7 @@ class PidController:
         self.prevTime = None
         self.prevError = None
         self.cumulative_error = 0.0
+        self.phi_list = []
     
     def pidStaticandMoving(self, msg):
 
@@ -31,19 +32,20 @@ class PidController:
 
         phi = -msg.phi
 
-        phi_list = []
+        d = msg.d
+
+        
         #moving average filter (noise reduction filter)
-        if(len(phi_list) < 5):
-            phi_list.append(phi)
+        if(len(self.phi_list) < 5):
+            self.phi_list.append(phi)
         else:
             #keeping the current 5
-            phi_list.append(phi)
-            phi_list.pop(0)
+            self.phi_list.append(phi)
+            self.phi_list.pop(0)
 
-            phi = (phi_list[0] + phi_list[1] + phi_list[2] + phi_list[3] + phi_list[4]) / 5.0
+            phi = (self.phi_list[0] + self.phi_list[1] + self.phi_list[2] + self.phi_list[3] + self.phi_list[4]) / 5.0
         
-        if(phi >= -0.1 and phi <= 0.1):
-            phi = 0
+        phi = phi * 0.5 if abs(phi) < 0.1 else phi
         
         if(self.prevTime == None or self.prevError == None):
             #set current time to previous time for next loop
@@ -89,3 +91,4 @@ if __name__=="__main__":
     rospy.init_node("pidcontroller", anonymous=True)
     PidController()
     rospy.spin()
+
