@@ -17,7 +17,10 @@ class PidController:
         self.prevTime = None
         self.prevError = None
         self.cumulative_error = 0.0
+        self.d_prevError = None
+        self.d_cumulative_error = 0.0
         self.phi_list = []
+        self.d_list = []
     
     def pidStaticandMoving(self, msg):
 
@@ -28,6 +31,10 @@ class PidController:
         ki = rospy.get_param("/ki")
         kd = rospy.get_param("/kd")
 
+        d_kp = rospy.get_param("/dkp")
+        d_ki = rospy.get_param("/dki")
+        d_kd = rospy.get_param("/dkd")
+
         now = rospy.Time.now()
 
         phi = -msg.phi
@@ -35,7 +42,7 @@ class PidController:
         d = msg.d
 
         
-        #moving average filter (noise reduction filter)
+        #moving average filter for phi and d(noise reduction filter)
         if(len(self.phi_list) < 5):
             self.phi_list.append(phi)
         else:
@@ -45,6 +52,15 @@ class PidController:
 
             phi = (self.phi_list[0] + self.phi_list[1] + self.phi_list[2] + self.phi_list[3] + self.phi_list[4]) / 5.0
         
+        if(len(self.d_list) < 5):
+            self.d_list.append(d)
+        else:
+            #keeping the current 5
+            self.d_list.append(d)
+            self.d_list.pop(0)
+
+            d = (self.d_list[0] + self.d_list[1] + self.d_list[2] + self.d_list[3] + self.d_list[4]) / 5.0
+        
         phi = phi * 0.5 if abs(phi) < 0.1 else phi
         
         if(self.prevTime == None or self.prevError == None):
@@ -53,6 +69,7 @@ class PidController:
 
             #set current error to previous error
             self.prevError = phi
+            self.d_prevError = d
 
             return
 
@@ -64,19 +81,24 @@ class PidController:
 
             #set current error to previous error
             self.prevError = phi
+            self.d_prevError = d
 
             return
 
         #code for integration
         self.cumulative_error += dt * phi
+        self.d_cumulative_error += dt* d
 
         #code for derivative
         deriv = (phi - self.prevError) / dt
+        d_deriv = (d - self.d_prevError) / dt
 
         #make control signal based on formula from handout
         control_signal = kp*phi + ki*self.cumulative_error + kd*deriv
 
-        car_cmd.omega = control_signal
+        d_control_signal = d_kp*d + d_ki*self.d_cumulative_error + d_kd * d_deriv
+
+        car_cmd.omega = 2 * control_signal + d_control_signal
 
         self.pub_pid.publish(car_cmd)
 
