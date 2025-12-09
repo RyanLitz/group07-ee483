@@ -40,14 +40,15 @@ class FollowMM:
             if dist <= 0.10:  
                 rospy.logwarn("[follow_mm] Too close → stopping.")
                 rospy.set_param("/velocity", 0.0) 
+    
             elif dist <= 0.2:
                 rospy.set_param("/velocity", 0.2)
-            else:
-                rospy.set_param("/velocity", 0.3)
+
             
         else:
             rospy.loginfo("[follow_mm] No robot detected.")
             rospy.set_param("/velocity", 0.3)
+
         
 
         

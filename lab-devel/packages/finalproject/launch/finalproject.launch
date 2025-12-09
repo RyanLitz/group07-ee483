@@ -17,6 +17,7 @@
 </include>
 
 <include file="$(find lab3)/launch/lab3.launch"/>
+<!-- <include file="$(find duckietown_demos)/launch/lane_following.launch"></include> -->
 
 </launch>
 
